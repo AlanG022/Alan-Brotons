@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alan Brotons — Tech & Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#000000;
+  --black2:#080808;
+  --black3:#0f0f0f;
+  --black4:#161616;
+  --black5:#1e1e1e;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --gold3:#f5e0a0;
+  --gold-dark:#7a6028;
+  --gold-glow:rgba(201,168,76,0.35);
+  --text:#f5f0e8;
+  --text-muted:#7a7060;
+  --text-mid:#b0a080;
+  --border:rgba(201,168,76,0.15);
+  --border2:rgba(201,168,76,0.3);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:'Montserrat',sans-serif;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+.cursor{position:fixed;top:0;left:0;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transition:transform 0.08s;}
+.cursor-ring{position:fixed;top:0;left:0;width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9998;transition:transform 0.14s ease,width 0.25s,height 0.25s,opacity 0.25s;}
+.cursor-trail{position:fixed;top:0;left:0;width:6px;height:6px;background:var(--gold2);border-radius:50%;pointer-events:none;z-index:9997;opacity:0.4;transition:transform 0.25s ease;}
+
+/* LOADER */
+.loader{position:fixed;inset:0;background:var(--black);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:opacity 0.8s ease,visibility 0.8s ease;}
+.loader.hidden{opacity:0;visibility:hidden;}
+.loader-logo{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--gold);letter-spacing:0.05em;animation:loaderPulse 1.5s ease infinite;}
+.loader-bar-wrap{width:200px;height:1px;background:rgba(201,168,76,0.15);}
+.loader-bar{height:1px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold3));width:0%;animation:loadBar 1.8s ease forwards;}
+.loader-text{font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-muted);}
+@keyframes loaderPulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes loadBar{0%{width:0%;}100%{width:100%;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.8rem 5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);animation:fadeDown 1s ease 2s both;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--text);text-decoration:none;letter-spacing:0.04em;}
+.logo span{color:var(--gold);}
+.nav-links{display:flex;gap:3rem;list-style:none;}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;transition:color 0.3s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-6px;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform 0.4s ease;}
+.nav-links a:hover{color:var(--gold);}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left;}
+.nav-cta{padding:0.6rem 1.6rem;border:1px solid var(--gold);color:var(--gold);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:background 0.3s,color 0.3s;cursor:none;}
+.nav-cta:hover{background:var(--gold);color:var(--black);}
+
+/* HERO */
+#inicio{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:10rem 5rem 6rem;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,0.06) 0%, transparent 70%), radial-gradient(ellipse 50% 80% at 20% 70%, rgba(201,168,76,0.04) 0%, transparent 60%);z-index:0;}
+.hero-lines{position:absolute;inset:0;overflow:hidden;}
+.hero-lines::before{content:'';position:absolute;top:-50%;left:-10%;width:1px;height:200%;background:linear-gradient(to bottom,transparent,var(--gold),transparent);opacity:0.2;animation:lineSlide 6s ease-in-out infinite;}
+.hero-lines::after{content:'';position:absolute;top:-50%;right:20%;width:1px;height:200%;background:linear-gradient(to bottom,transparent,var(--gold2),transparent);opacity:0.1;animation:lineSlide 8s ease-in-out infinite reverse;}
+@keyframes lineSlide{0%,100%{transform:translateY(-10%) scaleY(0.8);}50%{transform:translateY(10%) scaleY(1.2);}}
+.hero-deco-circle{position:absolute;border-radius:50%;border:1px solid var(--border);}
+.hero-deco-circle:nth-child(1){width:600px;height:600px;top:50%;right:-15%;transform:translateY(-50%);animation:rotateSlow 30s linear infinite;}
+.hero-deco-circle:nth-child(2){width:400px;height:400px;top:50%;right:-5%;transform:translateY(-50%);animation:rotateSlow 20s linear infinite reverse;border-color:rgba(201,168,76,0.08);}
+.hero-deco-circle:nth-child(3){width:200px;height:200px;top:50%;right:10%;transform:translateY(-50%);animation:rotateSlow 12s linear infinite;}
+@keyframes rotateSlow{0%{transform:translateY(-50%) rotate(0deg);}100%{transform:translateY(-50%) rotate(360deg);}}
+.hero-corner{position:absolute;width:80px;height:80px;opacity:0.4;}
+.hero-corner-tl{top:8rem;left:5rem;border-top:1px solid var(--gold);border-left:1px solid var(--gold);}
+.hero-corner-br{bottom:6rem;right:5rem;border-bottom:1px solid var(--gold);border-right:1px solid var(--gold);}
+.hero-corner-tr{top:8rem;right:5rem;border-top:1px solid var(--gold);border-right:1px solid var(--gold);width:40px;height:40px;}
+.hero-corner-bl{bottom:6rem;left:5rem;border-bottom:1px solid var(--gold);border-left:1px solid var(--gold);width:40px;height:40px;}
+.hero-content{position:relative;z-index:2;max-width:780px;}
+.hero-eyebrow{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;animation:fadeUp 0.8s ease 2.2s both;}
+.eyebrow-line{width:40px;height:1px;background:var(--gold);}
+.eyebrow-text{font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);font-weight:500;}
+h1{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,7vw,6.5rem);font-weight:900;line-height:0.92;letter-spacing:-0.02em;margin-bottom:2rem;animation:fadeUp 0.9s ease 2.4s both;}
+.h1-italic{font-style:italic;font-weight:400;color:var(--gold);display:block;}
+.h1-solid{display:block;color:var(--text);}
+.h1-small{font-family:'Montserrat',serif;font-size:clamp(1rem,2vw,1.4rem);font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);display:block;margin-top:0.5rem;}
+.hero-divider{display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;animation:fadeUp 0.9s ease 2.6s both;}
+.divider-line{flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent);}
+.divider-diamond{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
+.hero-desc{font-size:1rem;color:var(--text-mid);line-height:1.9;font-weight:300;max-width:520px;margin-bottom:3.5rem;animation:fadeUp 0.9s ease 2.8s both;}
+.hero-desc em{color:var(--gold2);font-style:normal;}
+.hero-ctas{display:flex;gap:1.2rem;flex-wrap:wrap;animation:fadeUp 0.9s ease 3s both;}
+.btn-gold{padding:1rem 2.8rem;background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold2));color:var(--black);font-weight:700;font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;position:relative;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;cursor:none;}
+.btn-gold::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.2),transparent);transform:translateX(-100%);transition:transform 0.5s;}
+.btn-gold:hover::before{transform:translateX(100%);}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 10px 50px rgba(201,168,76,0.4);}
+.btn-outline-gold{padding:1rem 2.8rem;background:transparent;color:var(--gold);font-weight:500;font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;border:1px solid var(--gold);transition:background 0.3s,color 0.3s,box-shadow 0.3s;cursor:none;}
+.btn-outline-gold:hover{background:rgba(201,168,76,0.08);box-shadow:0 0 30px rgba(201,168,76,0.15);}
+.hero-scroll{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.8rem;color:var(--text-muted);font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;animation:fadeUp 1s ease 3.2s both;}
+.scroll-mouse{width:22px;height:36px;border:1px solid var(--border2);border-radius:11px;display:flex;justify-content:center;padding-top:6px;}
+.scroll-wheel{width:3px;height:8px;background:var(--gold);border-radius:2px;animation:scrollWheel 2s ease infinite;}
+@keyframes scrollWheel{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(12px);opacity:0;}}
+
+/* MARQUEE */
+.marquee-wrap{background:var(--black3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.2rem 0;overflow:hidden;}
+.marquee-track{display:flex;gap:4rem;animation:marquee 20s linear infinite;white-space:nowrap;}
+.marquee-item{display:flex;align-items:center;gap:1.5rem;font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);flex-shrink:0;}
+.marquee-dot{width:4px;height:4px;background:var(--gold);border-radius:50%;flex-shrink:0;}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ABOUT */
+.intro-section{padding:10rem 5rem;background:var(--black2);position:relative;overflow:hidden;}
+.intro-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.intro-section::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:8rem;align-items:center;max-width:1200px;margin:0 auto;}
+.big-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:300;font-style:italic;line-height:1.3;color:var(--text);margin-bottom:2rem;}
+.big-quote span{color:var(--gold);}
+.intro-signature{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-style:italic;}
+.intro-right{display:flex;flex-direction:column;gap:2.5rem;}
+.intro-p{font-size:0.95rem;line-height:1.9;color:var(--text-mid);font-weight:300;}
+.intro-p strong{color:var(--gold2);font-weight:600;}
+.intro-values{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.value-item{padding:1.2rem;border:1px solid var(--border);background:rgba(201,168,76,0.02);transition:border-color 0.3s,background 0.3s;}
+.value-item:hover{border-color:var(--border2);background:rgba(201,168,76,0.05);}
+.value-icon{font-size:1.3rem;margin-bottom:0.6rem;}
+.value-name{font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.3rem;}
+.value-desc{font-size:0.8rem;color:var(--text-muted);line-height:1.6;}
+
+/* SERVICES */
+#servicios{padding:10rem 5rem;background:var(--black);position:relative;overflow:hidden;}
+#servicios::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.services-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6rem;}
+.section-tag{display:flex;align-items:center;gap:1rem;color:var(--gold);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;margin-bottom:1.2rem;}
+.section-tag::before{content:'';display:block;width:35px;height:1px;background:var(--gold);}
+.section-h2{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:900;letter-spacing:-0.02em;line-height:1;color:var(--text);}
+.section-h2 em{color:var(--gold);font-style:italic;}
+.services-head-right{max-width:300px;color:var(--text-muted);font-size:0.9rem;line-height:1.8;font-weight:300;text-align:right;}
+.services-list{display:flex;flex-direction:column;}
+.service-row{display:grid;grid-template-columns:80px 1fr 1fr 120px;gap:3rem;align-items:center;padding:3.5rem 0;border-bottom:1px solid var(--border);transition:padding-left 0.4s;position:relative;overflow:hidden;}
+.service-row::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(201,168,76,0.04),transparent);transform:translateX(-100%);transition:transform 0.5s ease;}
+.service-row:hover::before{transform:translateX(0);}
+.service-row:hover{padding-left:1.5rem;}
+.svc-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:rgba(201,168,76,0.15);line-height:1;transition:color 0.3s;}
+.service-row:hover .svc-num{color:rgba(201,168,76,0.4);}
+.svc-icon-row{display:flex;align-items:center;gap:1rem;margin-bottom:0.8rem;}
+.svc-icon{font-size:1.5rem;}
+.svc-name{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--text);transition:color 0.3s;}
+.service-row:hover .svc-name{color:var(--gold2);}
+.svc-sub{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dark);font-weight:500;}
+.svc-features-col{display:flex;flex-direction:column;gap:0.6rem;}
+.svc-feature{display:flex;align-items:center;gap:0.7rem;font-size:0.82rem;color:var(--text-muted);}
+.svc-feature::before{content:'◆';color:var(--gold);font-size:0.4rem;flex-shrink:0;}
+.svc-arrow{width:48px;height:48px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;transition:background 0.3s,border-color 0.3s,transform 0.3s;margin-left:auto;}
+.service-row:hover .svc-arrow{background:var(--gold);color:var(--black);border-color:var(--gold);transform:rotate(45deg);}
+
+/* NUMBERS */
+.numbers-section{padding:8rem 5rem;background:var(--black3);position:relative;overflow:hidden;}
+.numbers-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%);}
+.numbers-section::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.numbers-inner{max-width:1200px;margin:0 auto;}
+.numbers-top{text-align:center;margin-bottom:6rem;}
+.numbers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);}
+.number-card{padding:4rem 2rem;text-align:center;border-right:1px solid var(--border);position:relative;overflow:hidden;transition:background 0.4s;}
+.number-card:last-child{border-right:none;}
+.number-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 100%, rgba(201,168,76,0.08), transparent 60%);opacity:0;transition:opacity 0.4s;}
+.number-card:hover::before{opacity:1;}
+.number-card:hover{background:rgba(201,168,76,0.03);}
+.num-big{font-family:'Playfair Display',serif;font-size:clamp(3rem,5vw,5rem);font-weight:900;color:var(--gold);line-height:1;display:block;}
+.num-suffix{font-size:0.6em;vertical-align:super;}
+.num-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-top:1rem;display:block;font-weight:500;}
+.num-desc{font-size:0.8rem;color:rgba(120,110,90,0.8);margin-top:0.4rem;}
+
+/* PROCESS */
+.process-section{padding:10rem 5rem;background:var(--black2);position:relative;overflow:hidden;}
+.process-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.process-header{text-align:center;margin-bottom:7rem;}
+.process-timeline{max-width:1000px;margin:0 auto;position:relative;}
+.process-timeline::before{content:'';position:absolute;left:50%;top:28px;bottom:28px;width:1px;background:linear-gradient(to bottom,var(--gold),rgba(201,168,76,0.1));transform:translateX(-50%);}
+.process-item{display:flex;align-items:flex-start;gap:4rem;margin-bottom:5rem;position:relative;}
+.process-item:nth-child(even){flex-direction:row-reverse;}
+.process-item:last-child{margin-bottom:0;}
+.process-side{flex:1;}
+.process-item:nth-child(odd) .process-side:first-child{text-align:right;}
+.process-step-num{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:0.8rem;}
+.process-step-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--text);margin-bottom:0.8rem;}
+.process-step-desc{font-size:0.88rem;color:var(--text-muted);line-height:1.8;font-weight:300;}
+.process-dot-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.process-dot{width:56px;height:56px;border:1px solid var(--gold);border-radius:50%;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:background 0.3s,box-shadow 0.3s;position:relative;z-index:1;}
+.process-item:hover .process-dot{background:rgba(201,168,76,0.1);box-shadow:0 0 30px rgba(201,168,76,0.3);}
+
+/* QUOTE */
+.quote-section{padding:8rem 5rem;background:var(--black);text-align:center;position:relative;overflow:hidden;}
+.quote-section::before,.quote-section::after{content:'';position:absolute;left:50%;transform:translateX(-50%);height:1px;width:200px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.quote-section::before{top:0;}
+.quote-section::after{bottom:0;}
+.quote-bg-text{position:absolute;font-family:'Playfair Display',serif;font-size:20rem;font-weight:900;color:rgba(201,168,76,0.02);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;user-select:none;}
+.quote-inner{position:relative;z-index:1;max-width:800px;margin:0 auto;}
+.quote-marks{font-family:'Playfair Display',serif;font-size:6rem;color:var(--gold);line-height:0.5;opacity:0.3;margin-bottom:1rem;}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.5rem);font-weight:300;font-style:italic;line-height:1.4;color:var(--text);margin-bottom:2.5rem;}
+.quote-text span{color:var(--gold);}
+.quote-author{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);}
+
+/* CONTACT */
+#contacto{padding:10rem 5rem;background:var(--black2);position:relative;overflow:hidden;}
+#contacto::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+#contacto::after{content:'';position:absolute;bottom:-300px;right:-200px;width:600px;height:600px;border:1px solid var(--border);border-radius:50%;}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8rem;align-items:start;max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+.contact-desc{font-size:0.95rem;color:var(--text-mid);line-height:1.9;font-weight:300;margin-bottom:4rem;}
+.contact-channels{display:flex;flex-direction:column;gap:1.2rem;margin-bottom:3rem;}
+.channel-card{display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;border:1px solid var(--border);background:rgba(201,168,76,0.02);text-decoration:none;transition:border-color 0.3s,background 0.3s,transform 0.3s;cursor:none;position:relative;overflow:hidden;}
+.channel-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transition:transform 0.3s;}
+.channel-card:hover::before{transform:scaleY(1);}
+.channel-card:hover{border-color:var(--border2);background:rgba(201,168,76,0.05);transform:translateX(8px);}
+.channel-icon-wrap{width:52px;height:52px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;transition:border-color 0.3s;}
+.channel-card:hover .channel-icon-wrap{border-color:var(--gold);}
+.channel-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);}
+.channel-value{font-size:1rem;color:var(--text);font-weight:500;margin-top:0.2rem;}
+.channel-arrow{margin-left:auto;color:var(--gold);opacity:0;transform:translateX(-8px);transition:opacity 0.3s,transform 0.3s;font-size:1rem;}
+.channel-card:hover .channel-arrow{opacity:1;transform:translateX(0);}
+.contact-availability{padding:1.5rem 2rem;border:1px solid var(--border);background:rgba(201,168,76,0.02);}
+.availability-title{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;}
+.availability-status{display:flex;align-items:center;gap:0.6rem;font-size:0.9rem;color:var(--text-mid);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;animation:statusPulse 2s ease infinite;}
+@keyframes statusPulse{0%,100%{box-shadow:0 0 5px #4ade80;}50%{box-shadow:0 0 15px #4ade80,0 0 30px rgba(74,222,128,0.3);}}
+.contact-form-wrap{background:var(--black3);border:1px solid var(--border);padding:3.5rem;}
+.form-header{margin-bottom:2.5rem;}
+.form-header-top{display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;}
+.form-diamond{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
+.form-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--text);}
+.form-subtitle{font-size:0.8rem;color:var(--text-muted);letter-spacing:0.05em;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{margin-bottom:1.2rem;}
+.form-label{display:block;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;font-weight:500;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--black);border:1px solid var(--border);padding:0.9rem 1.2rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:0.9rem;font-weight:300;outline:none;transition:border-color 0.3s,box-shadow 0.3s;appearance:none;}
+.form-textarea{resize:vertical;min-height:120px;}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23c9a84c' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1.2rem center;padding-right:3rem;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,168,76,0.5);box-shadow:0 0 0 2px rgba(201,168,76,0.08);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted);font-weight:300;}
+.form-submit{width:100%;padding:1.1rem;background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold2));color:var(--black);font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;border:none;cursor:none;transition:transform 0.3s,box-shadow 0.3s;position:relative;overflow:hidden;margin-top:0.5rem;}
+.form-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.25),transparent);transform:translateX(-100%);transition:transform 0.6s;}
+.form-submit:hover::before{transform:translateX(100%);}
+.form-submit:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(201,168,76,0.4);}
+.sent-msg{display:none;text-align:center;padding:1rem;color:var(--gold);font-weight:600;letter-spacing:0.05em;font-size:0.9rem;border:1px solid var(--border);margin-top:1rem;}
+
+/* FOOTER */
+footer{background:var(--black);padding:5rem 5rem 3rem;position:relative;}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:5rem;margin-bottom:4rem;}
+.footer-logo-big{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--text);margin-bottom:1rem;display:block;}
+.footer-logo-big span{color:var(--gold);}
+.footer-tagline{font-size:0.85rem;color:var(--text-muted);line-height:1.8;font-weight:300;max-width:250px;}
+.footer-col-title{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;font-weight:500;}
+.footer-links{display:flex;flex-direction:column;gap:0.8rem;}
+.footer-links a{color:var(--text-muted);text-decoration:none;font-size:0.85rem;transition:color 0.3s;font-weight:300;}
+.footer-links a:hover{color:var(--gold);}
+.footer-contact-items{display:flex;flex-direction:column;gap:0.8rem;}
+.footer-contact-item{display:flex;align-items:center;gap:0.8rem;color:var(--text-muted);font-size:0.85rem;font-weight:300;}
+.footer-contact-item span{color:var(--gold);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-copy{color:var(--text-muted);font-size:0.75rem;letter-spacing:0.05em;}
+.footer-social{display:flex;gap:1rem;}
+.social-btn{width:36px;height:36px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.9rem;text-decoration:none;transition:border-color 0.3s,color 0.3s,background 0.3s;cursor:none;}
+.social-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.05);}
+
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:1;}
+.particle{position:absolute;width:1.5px;height:1.5px;background:var(--gold);border-radius:50%;animation:particleUp linear infinite;opacity:0;}
+@keyframes particleUp{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:0.5;}85%{opacity:0.15;}100%{transform:translateY(-50px) scale(1);opacity:0;}}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(35px);transition:opacity 0.8s ease,transform 0.8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-35px);transition:opacity 0.8s ease,transform 0.8s ease;}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(35px);transition:opacity 0.8s ease,transform 0.8s ease;}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+.d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}.d3{transition-delay:0.3s;}.d4{transition-delay:0.4s;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:900px){
+  nav{padding:1.2rem 1.5rem;}
+  .nav-links,.nav-cta{display:none;}
+  #inicio,#servicios,#contacto,.intro-section,.process-section,.numbers-section,.quote-section{padding:6rem 1.5rem;}
+  .services-head{flex-direction:column;gap:2rem;align-items:flex-start;}
+  .services-head-right{text-align:left;max-width:100%;}
+  .service-row{grid-template-columns:60px 1fr;gap:1.5rem;padding:2.5rem 0;}
+  .svc-features-col,.svc-arrow{display:none;}
+  .intro-grid,.contact-grid,.footer-top{grid-template-columns:1fr;gap:3rem;}
+  .numbers-grid{grid-template-columns:1fr 1fr;border:none;gap:1px;background:var(--border);}
+  .number-card{border-right:none;background:var(--black3);}
+  .process-timeline::before{left:28px;}
+  .process-item,.process-item:nth-child(even){flex-direction:row;gap:2rem;}
+  .process-item:nth-child(odd) .process-side:first-child{text-align:left;}
+  footer{padding:4rem 1.5rem 2rem;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader-logo">AB</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-text">Cargando experiencia</div>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<div class="cursor-trail" id="cursor-trail"></div>
+<div class="particles" id="particles"></div>
+
+<nav>
+  <a href="#inicio" class="logo">Alan<span>.</span>Brotons</a>
+  <ul class="nav-links">
+    <li><a href="#inicio">Inicio</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#contacto" class="nav-cta">Contactar</a>
+</nav>
+
+<section id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-deco-circle"></div>
+  <div class="hero-deco-circle"></div>
+  <div class="hero-deco-circle"></div>
+  <div class="hero-corner hero-corner-tl"></div>
+  <div class="hero-corner hero-corner-br"></div>
+  <div class="hero-corner hero-corner-tr"></div>
+  <div class="hero-corner hero-corner-bl"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      <span class="eyebrow-text">Tecnología & Diseño Digital · Buenos Aires</span>
+    </div>
+    <h1>
+      <span class="h1-solid">Hola, soy</span>
+      <span class="h1-italic">Alan Brotons</span>
+      <span class="h1-small">Especialista en tecnología</span>
+    </h1>
+    <div class="hero-divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+    </div>
+    <p class="hero-desc">
+      Reparo y mantengo tus equipos con <em>precisión y rapidez</em>. Diseño páginas web modernas que <em>hacen crecer tu negocio</em>. Trabajo serio, con garantía y trato personalizado.
+    </p>
+    <div class="hero-ctas">
+      <a href="#servicios" class="btn-gold">Ver servicios</a>
+      <a href="#contacto" class="btn-outline-gold">Hablemos</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+    Scroll
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span class="marquee-dot"></span>Mantenimiento de PC</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Reparación de computadoras</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Diseño web profesional</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Eliminación de virus</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Recuperación de datos</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Landing pages</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Instalación de Windows</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Soporte técnico</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Mantenimiento de PC</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Reparación de computadoras</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Diseño web profesional</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Eliminación de virus</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Recuperación de datos</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Landing pages</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Instalación de Windows</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Soporte técnico</span>
+  </div>
+</div>
+
+<div class="intro-section">
+  <div class="intro-grid">
+    <div class="intro-left reveal-left">
+      <p class="big-quote">"La tecnología al servicio de <span>tu vida y tu negocio</span>, sin complicaciones."</p>
+      <div class="intro-signature">— Alan Brotons</div>
+    </div>
+    <div class="intro-right">
+      <p class="intro-p reveal d1">Soy <strong>Alan Brotons</strong>, técnico en computación y diseñador web con base en Buenos Aires. Me dedico a resolver problemas tecnológicos de manera <strong>rápida, transparente y con garantía</strong>.</p>
+      <p class="intro-p reveal d2">Ya sea que tu computadora no enciende, está lenta, tiene virus, o necesitás una <strong>página web que represente tu marca</strong>, estoy acá para ayudarte con trato personalizado y calidad profesional.</p>
+      <div class="intro-values reveal d3">
+        <div class="value-item">
+          <div class="value-icon">⚡</div>
+          <div class="value-name">Rapidez</div>
+          <div class="value-desc">Entrega ágil sin sacrificar calidad</div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">🛡️</div>
+          <div class="value-name">Garantía</div>
+          <div class="value-desc">Respaldo total en cada trabajo</div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">💎</div>
+          <div class="value-name">Calidad</div>
+          <div class="value-desc">Estándar profesional en todo</div>
+        </div>
+        <div class="value-item">
+          <div class="value-icon">🤝</div>
+          <div class="value-name">Confianza</div>
+          <div class="value-desc">Trato honesto y transparente</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="servicios">
+  <div class="services-head">
+    <div class="services-head-left reveal-left">
+      <div class="section-tag">Lo que hago</div>
+      <h2 class="section-h2">Servicios <em>especializados</em><br>para vos</h2>
+    </div>
+    <div class="services-head-right reveal-right">Soluciones tecnológicas reales para particulares y negocios. Presupuesto claro antes de empezar, sin sorpresas.</div>
+  </div>
+  <div class="services-list">
+    <div class="service-row reveal">
+      <div class="svc-num">01</div>
+      <div>
+        <div class="svc-icon-row"><span class="svc-icon">🔧</span><span class="svc-sub">Hardware & Software</span></div>
+        <div class="svc-name">Mantenimiento de PC</div>
+      </div>
+      <div class="svc-features-col">
+        <span class="svc-feature">Limpieza interna y externa</span>
+        <span class="svc-feature">Actualización de drivers y sistema</span>
+        <span class="svc-feature">Optimización del rendimiento</span>
+        <span class="svc-feature">Diagnóstico preventivo completo</span>
+      </div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="service-row reveal d1">
+      <div class="svc-num">02</div>
+      <div>
+        <div class="svc-icon-row"><span class="svc-icon">💻</span><span class="svc-sub">Diagnóstico & Reparación</span></div>
+        <div class="svc-name">Reparación de PC</div>
+      </div>
+      <div class="svc-features-col">
+        <span class="svc-feature">Reparación de hardware y pantallas</span>
+        <span class="svc-feature">Eliminación de virus y malware</span>
+        <span class="svc-feature">Recuperación de datos perdidos</span>
+        <span class="svc-feature">Instalación y reinstalación de Windows</span>
+      </div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="service-row reveal d2">
+      <div class="svc-num">03</div>
+      <div>
+        <div class="svc-icon-row"><span class="svc-icon">🌐</span><span class="svc-sub">Diseño & Desarrollo Web</span></div>
+        <div class="svc-name">Páginas Web Profesionales</div>
+      </div>
+      <div class="svc-features-col">
+        <span class="svc-feature">Diseño moderno y responsive</span>
+        <span class="svc-feature">Landing pages y portfolios</span>
+        <span class="svc-feature">Sitios para negocios y emprendedores</span>
+        <span class="svc-feature">Entrega rápida con soporte incluido</span>
+      </div>
+      <div class="svc-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<div class="numbers-section">
+  <div class="numbers-inner">
+    <div class="numbers-top">
+      <div class="section-tag reveal" style="justify-content:center;">
+        <span style="width:35px;height:1px;background:var(--gold);display:block;"></span>
+        En números
+        <span style="width:35px;height:1px;background:var(--gold);display:block;"></span>
+      </div>
+      <h2 class="section-h2 reveal d1" style="text-align:center;">El resultado de <em>años de trabajo</em></h2>
+    </div>
+    <div class="numbers-grid reveal d2">
+      <div class="number-card">
+        <span class="num-big" data-count="150">0<span class="num-suffix">+</span></span>
+        <span class="num-label">Equipos reparados</span>
+        <div class="num-desc">PCs, notebooks y más</div>
+      </div>
+      <div class="number-card">
+        <span class="num-big" data-count="50">0<span class="num-suffix">+</span></span>
+        <span class="num-label">Sitios web creados</span>
+        <div class="num-desc">Para negocios y personas</div>
+      </div>
+      <div class="number-card">
+        <span class="num-big" data-count="100">0<span class="num-suffix">%</span></span>
+        <span class="num-label">Satisfacción garantizada</span>
+        <div class="num-desc">Cada trabajo con respaldo</div>
+      </div>
+      <div class="number-card">
+        <span class="num-big" data-count="5">0<span class="num-suffix">+</span></span>
+        <span class="num-label">Años de experiencia</span>
+        <div class="num-desc">Aprendizaje constante</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="process-section">
+  <div class="process-header">
+    <div class="section-tag reveal" style="justify-content:center;">
+      <span style="width:35px;height:1px;background:var(--gold);display:block;"></span>
+      Mi proceso
+      <span style="width:35px;height:1px;background:var(--gold);display:block;"></span>
+    </div>
+    <h2 class="section-h2 reveal d1" style="text-align:center;">Simple, <em>transparente</em><br>y sin sorpresas</h2>
+  </div>
+  <div class="process-timeline">
+    <div class="process-item reveal">
+      <div class="process-side">
+        <div class="process-step-num">Paso 01</div>
+        <div class="process-step-title">Consulta inicial</div>
+        <div class="process-step-desc">Me contás el problema o lo que necesitás. Sin compromisos, te escucho y te oriento desde el primer mensaje.</div>
+      </div>
+      <div class="process-dot-wrap"><div class="process-dot">💬</div></div>
+      <div class="process-side"></div>
+    </div>
+    <div class="process-item reveal d1">
+      <div class="process-side"></div>
+      <div class="process-dot-wrap"><div class="process-dot">🔍</div></div>
+      <div class="process-side">
+        <div class="process-step-num">Paso 02</div>
+        <div class="process-step-title">Diagnóstico y presupuesto</div>
+        <div class="process-step-desc">Analizo el caso en detalle y te doy un presupuesto claro y honesto. Sin costos ocultos ni sorpresas.</div>
+      </div>
+    </div>
+    <div class="process-item reveal d2">
+      <div class="process-side">
+        <div class="process-step-num">Paso 03</div>
+        <div class="process-step-title">Ejecución profesional</div>
+        <div class="process-step-desc">Trabajo con precisión y dedicación. Te mantengo informado durante todo el proceso.</div>
+      </div>
+      <div class="process-dot-wrap"><div class="process-dot">⚙️</div></div>
+      <div class="process-side"></div>
+    </div>
+    <div class="process-item reveal d3">
+      <div class="process-side"></div>
+      <div class="process-dot-wrap"><div class="process-dot">✅</div></div>
+      <div class="process-side">
+        <div class="process-step-num">Paso 04</div>
+        <div class="process-step-title">Entrega y soporte</div>
+        <div class="process-step-desc">Entrego todo listo y con garantía. Quedo disponible ante cualquier consulta posterior.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="quote-section">
+  <div class="quote-bg-text">"</div>
+  <div class="quote-inner reveal">
+    <div class="quote-marks">"</div>
+    <p class="quote-text">Cada equipo que reparo y cada web que diseño lleva mi nombre. Por eso trabajo con el mismo <span>esfuerzo y sabiduría</span> en cada proyecto, sin importar el tamaño.</p>
+    <div class="quote-author">Alan Brotons · Técnico & Diseñador Web · Buenos Aires</div>
+  </div>
+</div>
+
+<section id="contacto">
+  <div class="contact-grid">
+    <div>
+      <div class="section-tag reveal">Hablemos</div>
+      <h2 class="section-h2 reveal d1">Contactame<br>cuando <em>quieras</em></h2>
+      <p class="contact-desc reveal d2">¿Tu equipo tiene problemas o querés tu propia página web? Escribime directamente por Instagram o WhatsApp. Te respondo rápido y con predisposición.</p>
+      <div class="contact-channels reveal d2">
+        <a href="https://instagram.com/alannbrotons" target="_blank" class="channel-card">
+          <div class="channel-icon-wrap">📸</div>
+          <div>
+            <div class="channel-label">Instagram</div>
+            <div class="channel-value">@alannbrotons</div>
+          </div>
+          <div class="channel-arrow">→</div>
+        </a>
+        <a href="https://wa.me/541122509964" target="_blank" class="channel-card">
+          <div class="channel-icon-wrap">💬</div>
+          <div>
+            <div class="channel-label">WhatsApp / Celular</div>
+            <div class="channel-value">11 2250-9964</div>
+          </div>
+          <div class="channel-arrow">→</div>
+        </a>
+      </div>
+      <div class="contact-availability reveal d3">
+        <div class="availability-title">Estado actual</div>
+        <div class="availability-status">
+          <div class="status-dot"></div>
+          Disponible para nuevos proyectos y reparaciones
+        </div>
+      </div>
+    </div>
+    <div class="contact-form-wrap reveal-right">
+      <div class="form-header">
+        <div class="form-header-top">
+          <div class="form-diamond"></div>
+          <div class="form-title">Enviame un mensaje</div>
+        </div>
+        <div class="form-subtitle">Te respondo a la brevedad por WhatsApp</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input class="form-input" type="text" placeholder="Tu nombre" id="f-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono (opcional)</label>
+          <input class="form-input" type="text" placeholder="Tu número">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Servicio que necesitás</label>
+        <select class="form-select" id="f-service">
+          <option value="">Seleccioná un servicio</option>
+          <option>Mantenimiento de PC</option>
+          <option>Reparación de PC / Notebook</option>
+          <option>Eliminación de virus</option>
+          <option>Recuperación de datos</option>
+          <option>Instalación de Windows</option>
+          <option>Diseño de página web</option>
+          <option>Landing page / Portfolio</option>
+          <option>Otro / Consulta general</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción del problema o proyecto</label>
+        <textarea class="form-textarea" placeholder="Contame brevemente qué necesitás o cuál es el problema..." id="f-msg"></textarea>
+      </div>
+      <button class="form-submit" onclick="sendForm()">Enviar por WhatsApp →</button>
+      <div class="sent-msg" id="sent-msg">✦ ¡Mensaje enviado! Te respondo pronto.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <span class="footer-logo-big">Alan<span>.</span>Brotons</span>
+      <p class="footer-tagline">Especialista en tecnología y diseño web. Trabajo serio, con garantía y trato personalizado en Buenos Aires.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Navegación</div>
+      <div class="footer-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Contacto directo</div>
+      <div class="footer-contact-items">
+        <div class="footer-contact-item"><span>📸</span> @alannbrotons</div>
+        <div class="footer-contact-item"><span>📱</span> 11 2250-9964</div>
+        <div class="footer-contact-item"><span>📍</span> Buenos Aires, Argentina</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Alan Brotons · Todos los derechos reservados</div>
+    <div class="footer-social">
+      <a href="https://instagram.com/alannbrotons" target="_blank" class="social-btn">📸</a>
+      <a href="https://wa.me/541122509964" target="_blank" class="social-btn">💬</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('load',()=>{ setTimeout(()=>{ document.getElementById('loader').classList.add('hidden'); },2000); });
+
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring'),trail=document.getElementById('cursor-trail');
+let mx=0,my=0,rx=0,ry=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{ mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-5}px,${my-5}px)`; });
+function animateCursor(){ rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;tx+=(mx-tx)*0.06;ty+=(my-ty)*0.06;ring.style.transform=`translate(${rx-22}px,${ry-22}px)`;trail.style.transform=`translate(${tx-3}px,${ty-3}px)`;requestAnimationFrame(animateCursor); }
+animateCursor();
+document.querySelectorAll('a,button,.service-row,.channel-card,.value-item,.number-card').forEach(el=>{ el.addEventListener('mouseenter',()=>{ring.style.width='70px';ring.style.height='70px';ring.style.borderColor='var(--gold2)';ring.style.opacity='0.5';}); el.addEventListener('mouseleave',()=>{ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='var(--gold)';ring.style.opacity='1';}); });
+
+const pc=document.getElementById('particles');
+for(let i=0;i<30;i++){ const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(10+Math.random()*20)+'s';p.style.animationDelay=(Math.random()*20)+'s';const s=(0.8+Math.random()*2)+'px';p.style.width=p.style.height=s;pc.appendChild(p); }
+
+const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting)e.target.classList.add('visible'); }); },{threshold:0.12});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
+
+const countObs=new IntersectionObserver(entries=>{ entries.forEach(entry=>{ if(entry.isIntersecting){ const el=entry.target,target=parseInt(el.dataset.count);const suffix=el.querySelector('.num-suffix')?.textContent||'+';let start=null;const dur=2000;const step=ts=>{ if(!start)start=ts;const prog=Math.min((ts-start)/dur,1);const ease=1-Math.pow(1-prog,4);el.innerHTML=Math.floor(ease*target)+`<span class="num-suffix">${suffix}</span>`;if(prog<1)requestAnimationFrame(step); };requestAnimationFrame(step);countObs.unobserve(el); } }); },{threshold:0.5});
+document.querySelectorAll('[data-count]').forEach(s=>countObs.observe(s));
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{ a.addEventListener('click',e=>{ const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} }); });
+
+function sendForm(){ const name=document.getElementById('f-name').value.trim(),service=document.getElementById('f-service').value,msg=document.getElementById('f-msg').value.trim();if(!name||!service){alert('Por favor completá tu nombre y el servicio que necesitás.');return;}const text=`Hola Alan! Soy ${name}. Me interesa: ${service}. ${msg?'Detalle: '+msg:''}`;window.open('https://wa.me/541122509964?text='+encodeURIComponent(text),'_blank');document.getElementById('sent-msg').style.display='block'; }
+
+window.addEventListener('scroll',()=>{ const y=window.scrollY;document.querySelectorAll('.hero-deco-circle').forEach((c,i)=>{ c.style.transform=`translateY(calc(-50% + ${y*(0.05+i*0.02)}px)) rotate(${y*(0.02*(i+1))}deg)`; }); });
+</script>
+</body>
+</html>
